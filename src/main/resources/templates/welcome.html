@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring Boot BOS утиліта</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+    <link rel="stylesheet" th:href="@{css/main.css}" />
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Spring Boot BOS утиліта</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Головна</a></li>
+                <li><a href="directory">Довідники</a></li>
+                <li><a href="document">Документи</a></li>
+                <li><a href="constant">Константи</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-6 col-md-4" th:each="thumb : ${thumbnails}">
+                    <a th:href="@{${thumb.link}}" class="thumbnail">
+                        <div class="caption">
+                            <h3 class="text-center" th:text="${thumb.title}"></h3>
+                        </div>
+                        <img th:src="${thumb.imgSrc}" th:alt="${thumb.alt}" width="200" height="200"/>
+                        <div class="text-center">
+                            <a href="#" class="btn btn-primary" role="button" data-toggle="modal" th:if="${thumb.title == 'Довідник'}" data-target="#modalDirectory">Додати</a>
+                            <a href="#" class="btn btn-primary" role="button" data-toggle="modal" th:if="${thumb.title == 'Документ'}" data-target="#modalDocument">Додати</a>
+                            <a href="#" class="btn btn-primary" role="button" data-toggle="modal" th:if="${thumb.title == 'Константа'}" data-target="#modalConstant">Додати</a>
+                            <a th:href="@{${thumb.link}}" class="btn btn-default" role="button">Переглянути</a>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- /.container -->
+
+
+<div id="modalDirectory" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Створення довідника</h4>
+            </div>
+
+            <form th:if="${selectedCatalog != null}" action="#" th:action="@{/directory}" th:object="${selectedCatalog}" method="post">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Оберіть довідник <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li th:if="${catalogs != null}" th:each="catalog : ${catalogs}"><a href="#" th:text="${catalog.name}" th:onclick="'document.getElementById(\'directoryInput\').value = \'' + ${catalog.name} + '\'; document.getElementById(\'directoryIdInput\').value = \'' + ${catalog.id} + '\';document.getElementById(\'nameInput\').value = \'' + ${catalog.name} + '\''"></a></li>
+                                    </ul>
+                                </div>
+                                <input type="text" class="form-control" aria-label="Обраний довідник" id="directoryInput" th:with="selectedCatalog = 'document.getElementById(\'directoryInput\').value'" />
+                                <input type="hidden" id="directoryIdInput" th:field="*{id}" />
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="nameInput" placeholder="Назва створюваного довідника" th:field="*{name}" />
+                                <span class="input-group-btn">
+                                <button class="btn btn-default" type="button">Перевірити</button>
+                            </span>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-6">
+
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Поле для відображення" th:field="*{presentationField}" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрити</button>
+                    <input type="submit" class="btn btn-success" value="Створити" />
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+<div id="modalDocument" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Створення документа</h4>
+            </div>
+
+            <form th:if="${selectedDocument != null}" action="#" th:action="@{/document}" th:object="${selectedDocument}" method="post">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Оберіть документ <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li th:if="${documents != null}" th:each="document : ${documents}"><a href="#" th:text="${document.name}" th:onclick="'document.getElementById(\'documentInput\').value = \'' + ${document.name} + '\'; document.getElementById(\'documentIdInput\').value = \'' + ${document.id} + '\';document.getElementById(\'docNameInput\').value = \'' + ${document.name} + '\';document.getElementById(\'docPresentationInput\').value = \'name++code.value\''"></a></li>
+                                    </ul>
+                                </div>
+                                <input type="text" class="form-control" aria-label="Обраний документ" id="documentInput" th:with="selectedDocument = 'document.getElementById(\'documentInput\').value'" />
+                                <input type="hidden" id="documentIdInput" th:field="*{id}" />
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="docNameInput" placeholder="Назва створюваного документа" th:field="*{name}" />
+                                <span class="input-group-btn">
+                                <button class="btn btn-default" type="button">Перевірити</button>
+                            </span>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-6">
+
+                            <div class="input-group">
+                                <input type="text" id="docPresentationInput" class="form-control" placeholder="Поле для відображення" th:field="*{presentationField}" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Закрити</button>
+                    <input type="submit" class="btn btn-success" value="Створити" />
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</body>
+</html>
